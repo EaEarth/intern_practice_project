@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import * as faker from 'faker';
 import { Command } from 'nestjs-command';
 
@@ -9,7 +9,7 @@ export class SeedsService {
 
   // use "npx nestjs-command <command>" to run seeding
   @Command({
-    command: 'seed',
+    command: 'create:all',
     describe: 'seeding all collection to database',
     autoExit: true,
   })

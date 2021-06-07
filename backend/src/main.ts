@@ -12,6 +12,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+
   const config = new DocumentBuilder()
     .setTitle('Practice Project')
     .setDescription('The practice project API description')
@@ -20,7 +21,13 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.enableCors();
+  app.enableCors({
+    origin: ['http://localhost:3000', process.env.URL],
+    credentials: true,
+  });
   await app.listen(8080, '127.0.0.1');
 }
 bootstrap();
