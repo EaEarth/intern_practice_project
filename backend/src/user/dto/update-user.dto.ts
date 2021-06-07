@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
@@ -7,23 +8,28 @@ import {
 } from 'class-validator';
 
 export class UpdateUserDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   id: String;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  readonly firstName: string;
+  readonly firstName?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  readonly lastName: string;
+  readonly lastName?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
-  readonly mobile: string;
+  readonly mobile?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
-  readonly email: string;
+  readonly email?: string;
 }
