@@ -4,6 +4,18 @@ import { Document } from 'mongoose';
 export type UserDocument = User & Document;
 
 @Schema()
-export class User {}
+export class User {
+  @Prop()
+  firstName: string;
 
-export const CatSchema = SchemaFactory.createForClass(User);
+  @Prop()
+  lastName: string;
+
+  @Prop()
+  email: string;
+
+  @Prop()
+  mobile: string;
+}
+
+export const UserSchema = SchemaFactory.createForClass(User);
