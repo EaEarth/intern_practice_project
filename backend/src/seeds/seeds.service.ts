@@ -24,6 +24,8 @@ export class SeedsService {
         lastName: faker.name.lastName(),
         mobile: faker.phone.phoneNumberFormat(),
         email: faker.internet.email(),
+        role: 'user',
+        password: 'test',
       };
       await this.userService.create(mockInfo);
     }

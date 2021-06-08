@@ -3,11 +3,14 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/guard/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -25,6 +28,7 @@ export class UserController {
     type: [User],
   })
   @Get()
+  @UseGuards(JwtAuthGuard)
   index(): Promise<UserDocument[]> {
     return this.service.index();
   }
@@ -41,6 +45,7 @@ export class UserController {
     type: User,
   })
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findById(@Param('id') id: string): Promise<UserDocument> {
     return this.service.findById(id);
   }
@@ -52,8 +57,16 @@ export class UserController {
     type: User,
   })
   @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserDocument> {
-    return await this.service.create(createUserDto);
+  @UseGuards(JwtAuthGuard)
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      const user = await this.service.create(createUserDto);
+      const { password, ...info } = createUserDto;
+      const userInfo = { ...info, ...{ id: user.id }, ...{ role: user.role } };
+      return userInfo;
+    } catch (err) {
+      throw new InternalServerErrorException('Email already exist');
+    }
   }
 
   @ApiOperation({ summary: 'Update an user' })
@@ -62,6 +75,7 @@ export class UserController {
     description: 'The user has been updated succesfully',
     type: User,
   })
+  @UseGuards(JwtAuthGuard)
   @Patch()
   async update(@Body() updateUserDto: UpdateUserDto): Promise<UserDocument> {
     return await this.service.update(updateUserDto);
@@ -78,6 +92,7 @@ export class UserController {
     description: 'The user has been deleted succesfully',
     type: User,
   })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<UserDocument> {
     return await this.service.delete(id);

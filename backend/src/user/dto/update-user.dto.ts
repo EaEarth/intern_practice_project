@@ -32,4 +32,9 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEmail()
   readonly email?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  readonly role?: string;
 }

@@ -15,12 +15,21 @@ export class User {
   lastName: string;
 
   @ApiProperty()
-  @Prop()
+  @Prop({
+    unique: true,
+  })
   email: string;
 
   @ApiProperty()
   @Prop()
   mobile: string;
+
+  @ApiProperty()
+  @Prop()
+  role: string;
+
+  @Prop({ select: false })
+  password: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
