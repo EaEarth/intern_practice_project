@@ -13,7 +13,21 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-  await app.register(fastifyHelmet);
+  app.enableCors({
+    origin: ['http://localhost:3000', process.env.URL],
+    credentials: true,
+  });
+  await app.register(fastifyHelmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [`'self'`],
+        styleSrc: [`'self'`, `'unsafe-inline'`],
+        imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
+        scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+      },
+    },
+  });
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const config = new DocumentBuilder()
     .setTitle('Practice Project')
     .setDescription('The practice project API description')
@@ -22,11 +36,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  app.enableCors({
-    origin: ['http://localhost:3000', process.env.URL],
-    credentials: true,
-  });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   await app.listen(8080, '127.0.0.1');
 }
 bootstrap();
