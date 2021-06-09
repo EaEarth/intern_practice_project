@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as faker from 'faker';
 import { Command } from 'nestjs-command';
+import { Role } from 'src/role/role.enum';
 
 @Injectable()
 export class SeedsService {
@@ -24,8 +25,8 @@ export class SeedsService {
         lastName: faker.name.lastName(),
         mobile: faker.phone.phoneNumberFormat(),
         email: faker.internet.email(),
-        role: 'user',
-        password: 'test',
+        role: [Role.User],
+        password: '1234',
       };
       await this.userService.create(mockInfo);
     }

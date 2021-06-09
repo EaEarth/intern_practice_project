@@ -7,16 +7,28 @@ import {
   Param,
   Patch,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/guard/jwt-auth.guard';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { RolesGuard } from 'src/role/roles.guard';
+import { JwtAuthGuard } from '../guard/jwt-auth.guard';
+import { Role } from '../role/role.enum';
+import { Roles } from '../role/roles.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { UserService } from './user.service';
 
 @ApiTags('User')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly service: UserService) {}
@@ -28,8 +40,7 @@ export class UserController {
     type: [User],
   })
   @Get()
-  @UseGuards(JwtAuthGuard)
-  index(): Promise<UserDocument[]> {
+  index(@Request() request): Promise<UserDocument[]> {
     return this.service.index();
   }
 
@@ -45,7 +56,6 @@ export class UserController {
     type: User,
   })
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   findById(@Param('id') id: string): Promise<UserDocument> {
     return this.service.findById(id);
   }
@@ -56,8 +66,8 @@ export class UserController {
     description: 'The user has been created succesfully',
     type: User,
   })
+  @Roles(Role.Admin)
   @Post()
-  @UseGuards(JwtAuthGuard)
   async create(@Body() createUserDto: CreateUserDto) {
     try {
       const user = await this.service.create(createUserDto);
@@ -75,7 +85,7 @@ export class UserController {
     description: 'The user has been updated succesfully',
     type: User,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Patch()
   async update(@Body() updateUserDto: UpdateUserDto): Promise<UserDocument> {
     return await this.service.update(updateUserDto);
@@ -92,7 +102,7 @@ export class UserController {
     description: 'The user has been deleted succesfully',
     type: User,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<UserDocument> {
     return await this.service.delete(id);

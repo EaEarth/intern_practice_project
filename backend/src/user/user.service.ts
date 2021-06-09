@@ -5,14 +5,19 @@ import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { Role } from '../role/role.enum';
+import { CaslAbilityFactory } from '../casl/casl-ability.factory';
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private caslAbilityFactory: CaslAbilityFactory,
+  ) {}
 
   async create(payload: CreateUserDto): Promise<UserDocument> {
     try {
-      if (!payload.role) payload.role = 'user';
-      let password, info, userInfo;
+      if (!payload.role) payload.role = [Role.User];
+      let password, info;
       ({ password, ...info } = payload);
       const hashedPassword = await this.hashPassword(password);
       const passwordObject = { password: hashedPassword };
@@ -47,7 +52,7 @@ export class UserService {
   loginByEmail(email: string): Promise<UserDocument> {
     return this.userModel
       .findOne({ email: email })
-      .select('email password')
+      .select('email password role')
       .exec();
   }
 

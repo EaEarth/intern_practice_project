@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
+import { Role } from 'src/role/role.enum';
 
 export type UserDocument = User & Document;
 
@@ -26,7 +27,7 @@ export class User {
 
   @ApiProperty()
   @Prop()
-  role: string;
+  role: Role[];
 
   @Prop({ select: false })
   password: string;

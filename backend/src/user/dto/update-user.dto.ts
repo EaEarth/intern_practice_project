@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Role } from 'src/role/role.enum';
 
 export class UpdateUserDto {
   @ApiProperty()
@@ -36,5 +37,5 @@ export class UpdateUserDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  readonly role?: string;
+  readonly role?: Role[];
 }
