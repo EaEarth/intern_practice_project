@@ -72,20 +72,20 @@ export class UserController {
     description: 'The user has been created succesfully',
     type: User,
   })
-  // @Roles(Role.Admin)
+  @Roles(Role.Admin)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    // try {
-    const user = await this.service.create(createUserDto);
-    const { password, ...info } = createUserDto;
-    const userInfo = { ...info, ...{ id: user.id }, ...{ role: user.role } };
-    return userInfo;
-    // } catch (err) {
-    //   this.logger.error({ message: err.message });
-    //   if (err.message.startsWith('E11000 duplicate key'))
-    //     throw new InternalServerErrorException('Email already exist');
-    //   else throw new InternalServerErrorException(err);
-    // }
+    try {
+      const user = await this.service.create(createUserDto);
+      const { password, ...info } = createUserDto;
+      const userInfo = { ...info, ...{ id: user.id }, ...{ role: user.role } };
+      return userInfo;
+    } catch (err) {
+      this.logger.error({ message: err.message });
+      if (err.message.startsWith('E11000 duplicate key'))
+        throw new InternalServerErrorException('Email already exist');
+      else throw new InternalServerErrorException(err);
+    }
   }
 
   @ApiOperation({ summary: 'Update an user' })
