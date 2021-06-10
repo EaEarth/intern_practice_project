@@ -3,11 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   InternalServerErrorException,
   Param,
   Patch,
   Post,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -17,7 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { RolesGuard } from 'src/role/roles.guard';
+import { RolesGuard } from '../role/roles.guard';
 import { JwtAuthGuard } from '../guard/jwt-auth.guard';
 import { Role } from '../role/role.enum';
 import { Roles } from '../role/roles.decorator';
@@ -25,13 +25,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { UserService } from './user.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @ApiTags('User')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
-  constructor(private readonly service: UserService) {}
+  constructor(
+    private readonly service: UserService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
 
   @ApiOperation({ summary: 'Get all user' })
   @ApiResponse({
@@ -40,7 +45,7 @@ export class UserController {
     type: [User],
   })
   @Get()
-  index(@Request() request): Promise<UserDocument[]> {
+  index(): Promise<User[]> {
     return this.service.index();
   }
 
@@ -52,11 +57,12 @@ export class UserController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Get the user according to the id',
-    type: User,
+    description:
+      'Get the user according to the id or null if user does not exist',
+    type: User || null,
   })
   @Get(':id')
-  findById(@Param('id') id: string): Promise<UserDocument> {
+  findById(@Param('id') id: string): Promise<User> {
     return this.service.findById(id);
   }
 
@@ -66,24 +72,28 @@ export class UserController {
     description: 'The user has been created succesfully',
     type: User,
   })
-  @Roles(Role.Admin)
+  // @Roles(Role.Admin)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    try {
-      const user = await this.service.create(createUserDto);
-      const { password, ...info } = createUserDto;
-      const userInfo = { ...info, ...{ id: user.id }, ...{ role: user.role } };
-      return userInfo;
-    } catch (err) {
-      throw new InternalServerErrorException('Email already exist');
-    }
+    // try {
+    const user = await this.service.create(createUserDto);
+    const { password, ...info } = createUserDto;
+    const userInfo = { ...info, ...{ id: user.id }, ...{ role: user.role } };
+    return userInfo;
+    // } catch (err) {
+    //   this.logger.error({ message: err.message });
+    //   if (err.message.startsWith('E11000 duplicate key'))
+    //     throw new InternalServerErrorException('Email already exist');
+    //   else throw new InternalServerErrorException(err);
+    // }
   }
 
   @ApiOperation({ summary: 'Update an user' })
   @ApiResponse({
     status: 200,
-    description: 'The user has been updated succesfully',
-    type: User,
+    description:
+      'The user has been updated succesfully or user does not exist if null',
+    type: User || null,
   })
   @Roles(Role.Admin)
   @Patch()
@@ -99,8 +109,9 @@ export class UserController {
   })
   @ApiResponse({
     status: 200,
-    description: 'The user has been deleted succesfully',
-    type: User,
+    description:
+      'The user has been deleted succesfully or user does not exist if null',
+    type: User || null,
   })
   @Roles(Role.Admin)
   @Delete(':id')

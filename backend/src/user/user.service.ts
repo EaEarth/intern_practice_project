@@ -9,29 +9,19 @@ import { Role } from '../role/role.enum';
 import { CaslAbilityFactory } from '../casl/casl-ability.factory';
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private caslAbilityFactory: CaslAbilityFactory,
-  ) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async create(payload: CreateUserDto): Promise<UserDocument> {
-    try {
-      if (!payload.role) payload.role = [Role.User];
-      let password, info;
-      ({ password, ...info } = payload);
-      const hashedPassword = await this.hashPassword(password);
-      const passwordObject = { password: hashedPassword };
-      const user = new this.userModel({
-        ...info,
-        ...passwordObject,
-      });
-      return user.save();
-      // ({ password, ...userInfo } = (await user.save()).);
-      // return userInfo;
-    } catch (err) {
-      console.log(err);
-      throw new InternalServerErrorException('Email already exist.');
-    }
+    if (!payload.role) payload.role = [Role.User];
+    let password, info;
+    ({ password, ...info } = payload);
+    const hashedPassword = await this.hashPassword(password);
+    const passwordObject = { password: hashedPassword };
+    const user = new this.userModel({
+      ...info,
+      ...passwordObject,
+    });
+    return user.save();
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -41,15 +31,15 @@ export class UserService {
     return hashedPassword;
   }
 
-  index(): Promise<UserDocument[]> {
+  index(): Promise<User[]> {
     return this.userModel.find().exec();
   }
 
-  findById(id: string): Promise<UserDocument> {
+  findById(id: string): Promise<User> {
     return this.userModel.findById(id).exec();
   }
 
-  loginByEmail(email: string): Promise<UserDocument> {
+  findByEmail(email: string): Promise<UserDocument> {
     return this.userModel
       .findOne({ email: email })
       .select('email password role')

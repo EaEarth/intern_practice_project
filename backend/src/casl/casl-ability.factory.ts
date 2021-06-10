@@ -6,7 +6,7 @@ import {
   InferSubjects,
 } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
-import { Role } from 'src/role/role.enum';
+import { Role } from '../role/role.enum';
 import { User } from '../user/schemas/user.schema';
 import { Action } from './action.enum';
 

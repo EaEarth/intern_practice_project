@@ -7,7 +7,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { fastifyHelmet } from 'fastify-helmet';
-import { RolesGuard } from './role/roles.guard';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -29,6 +29,7 @@ async function bootstrap() {
     },
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  // app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   const config = new DocumentBuilder()
     .setTitle('Practice Project')
     .setDescription('The practice project API description')

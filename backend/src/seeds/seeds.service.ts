@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as faker from 'faker';
 import { Command } from 'nestjs-command';
-import { Role } from 'src/role/role.enum';
+import { Role } from '../role/role.enum';
 
 @Injectable()
 export class SeedsService {
