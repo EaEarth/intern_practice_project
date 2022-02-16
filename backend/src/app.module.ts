@@ -8,10 +8,9 @@ import { AuthModule } from './auth/auth.module';
 import { CaslModule } from './casl/casl.module';
 import { JwtStrategy } from './guard/jwt.strategy';
 import { WinstonModule } from 'nest-winston';
-import * as winston from 'winston';
-import * as path from 'path';
 import 'winston-daily-rotate-file';
 import { LoggerConfig } from './config/logging.config';
+import { GlobalModule } from './global.module';
 
 const logger: LoggerConfig = new LoggerConfig();
 @Module({
@@ -27,6 +26,7 @@ const logger: LoggerConfig = new LoggerConfig();
     CaslModule,
     UserModule,
     SeedsModule,
+    GlobalModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

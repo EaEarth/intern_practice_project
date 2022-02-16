@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GlobalModule } from '../global.module';
 import { CaslModule } from '../casl/casl.module';
 import { User } from './schemas/user.schema';
 import { UserSchema } from './schemas/user.schema';

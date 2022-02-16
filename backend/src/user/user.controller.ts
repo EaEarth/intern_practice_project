@@ -118,4 +118,39 @@ export class UserController {
   async delete(@Param('id') id: string): Promise<UserDocument> {
     return await this.service.delete(id);
   }
+
+  //------------------------------------ GCloud database--------------------------//
+
+  @Roles(Role.Admin)
+  @Post('/cloud')
+  async createOnCloud(@Body() createUserDto: CreateUserDto) {
+    try {
+      const user = await this.service.creatOnCloud(createUserDto);
+      const { password, ...info } = createUserDto;
+      const userInfo = { ...info, ...{ id: user.id }, ...{ role: user.role } };
+      return userInfo;
+    } catch (err) {
+      console.log(err);
+      this.logger.error({ message: err.message });
+      if (err.message.startsWith('E11000 duplicate key'))
+        throw new InternalServerErrorException('Email already exist');
+      else throw new InternalServerErrorException(err);
+    }
+  }
+
+  @Get('cloud')
+  indexOnCloud() {
+    return this.service.indexOnCloud();
+  }
+
+  @Roles(Role.Admin)
+  @Delete('cloud/:email')
+  async deleteOnCloud(@Param('email') email: string) {
+    return await this.service.deleteOnCloud(email);
+  }
+
+  @Get('/cloud/email/:email')
+  findByEmailOnCloud(@Param('email') email: string): Promise<User> {
+    return this.service.findByEmailOnCloud(email);
+  }
 }

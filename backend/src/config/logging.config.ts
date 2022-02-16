@@ -1,5 +1,9 @@
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
+const { LoggingWinston } = require('@google-cloud/logging-winston');
+
+const projectId = process.env.PROJECT_ID;
+const loggingWinston = new LoggingWinston(projectId);
 
 export class LoggerConfig {
   private readonly options: winston.LoggerOptions;
@@ -20,6 +24,7 @@ export class LoggerConfig {
       exitOnError: false,
       format: this.format,
       transports: [
+        loggingWinston,
         new winston.transports.DailyRotateFile({
           dirname: './log/debug',
           filename: 'debug.log',
