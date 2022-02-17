@@ -5,7 +5,7 @@ This repository is for try working with following task as backend in nestjs
 ## Task
 
 - CRUD user with Rest API
-- Authentication and authorization with jwt token
+- Authentication and authorization
 - input validation
 - Google cloud and local logging with DailyRotateFile
 - Firestore database
